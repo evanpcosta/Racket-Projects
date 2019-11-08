@@ -1,0 +1,25 @@
+
+Proposal: Rubiks Cube Game
+
+JulianneCronin2021@u.northwestern.edu
+EvanCosta2022@u.northwestern.edu
+
+Overview
+========
+
+In our game, the player will have a flattened Rubik's cube that they will be able to scramble and solve by moving the rows and columns of the squares in the image shown. Each face of the cube has seven smaller squares in it that start all being the same color, with each face being a different color, and once scrambled each face has the smaller squares in a random order of colors. To win the game the user has to move the columns and rows in a specific way to make all the faces have a singular color. 
+
+Functional Requirements
+=======================
+
+1. The user can select all the rows in the cube, switching through them with the "w" and "s" keys
+	a. The program should highlight what row the user is on with a bold rectangle 		around the row
+2. The user can select all the columns in the cube using the "a" and "d" keys.
+	a. When the user switches from changing through the columns and rows the bold 		rectangle will switch from being vertical to horizontal.
+3. The user can shift each column in the cube up or down using the up or down arrow keys
+4. The user can shift each row in the cube left or right by using the left or right arrow keys.
+5. When the left column is moved the left face is rotated clockwise or counterclockwise depending on whether the column was moved up or down. The same is for the right column and the right face.
+6. When the bottom row is moved left or right the bottom face move clockwise or counterclockwise. The same is for the top row and the top face.
+7. When the middle row or middle column is moved, no face is rotated.
+8. When each of the faces of the Rubik's Cube contain seven smaller squares of the same color the program displays the word "solved" at the top of the screen.
+

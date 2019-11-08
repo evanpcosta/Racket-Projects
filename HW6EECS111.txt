@@ -1,0 +1,195 @@
+Design Document: Space Shooter
+
+Evan Costa
+evancosta2022@u.northwestern.edu
+Julianne Cronin
+juliannecronin2021@u.northwestern.edu
+
+1. Synopsis
+
+Red balls fall from random x-axis position at the top of a box at a constant velocity directly downwards and at random times. A green ball the same size as the red balls follows the the user’s mouse horizontal movement while remaining in the same vertical position at the bottom of the box. When the mouse is left-clicked a small white circle shoots out of the green circle and moves towards the top of the box at a constant velocity directly upwards. The green circle can only shoot white circles as long as there are less that four white circles in the box at any point in time. If a white circle touches a falling red circle then the red circle disappears, but the white circle does not disappear and maintains its trajectory. If a white circle touches more red circles than those red circles disappear too. Each time a white circle makes a red circle disappear the number in the top right corner of the box increases by one from the first number zero. As time progresses, the rate at which red circles are randomly generated is increased so that there are more red circles in the box later into the game than in the beginning. If a red ball is not disappeared by a white ball and reaches the bottom of the box then the game will end and the box will have the words “Game over! Play again?” “P - play” “q - quit” in the center, and the number zero shown in the top right corner. If the key “p” is pressed the game will start again and if the key “q” is pressed then the program keeps the same game over page described earlier but does not respond to any other keys pressed.
+
+
+2. Parameters 
+
+	- The width and height of the box
+	- The radius of the green and red balls
+	- The radius of the white balls
+	- The rate of descent for the red balls
+	- The rate of ascent of the white balls 
+	- The rate at which red balls are generated 
+	- The number of white balls that can be shot at once
+	- The position and size of the numbers in the top right corner
+	- The position and size of the game-over text at the end of the game
+
+3. Information Analysis & Data Definitions
+
+At each point in time there are a number of red balls and white balls with a position and velocity, and a green ball with a position that has the same posn-x as the user’s mouse. 
+
+
+A worldstate is
+	•	A [Listof rBall]
+	•	A [Listof wBall]
+	•	A gBall
+	•	The score, a number 
+
+         A rBall is
+	•	it’s x-position on the scene, number
+	•	It’s y-position on the scene, number 
+
+         A wBall is
+	•	it’s x position on the scene, number
+	•	It’s y position on the scene, number 
+
+        A gBall is
+	•	it’s x coordinate, number 
+
+-The benefits of representing the red balls as a list is it can contain as many red balls as needed. The length can also give the number of red balls currently on screen.
+-The benefits of representing white balls as a list is the length allows for an easy limit on how many can be on screen at once.
+-Representing rBall and wBall as their position is used to check whether they have colidded, and where to render the circles.
+-There is only one gBall, and the simplest representation is its position.
+
+
+
+4.  Main Program Tasks
+
+
+	- Generate red balls randomly at the top of the box
+				- that descend at a constant rate and direction
+	
+	- Generate white balls when mouse left-clicks
+				- from the position off the green ball when the mouse was left clicked
+				- that ascend at a constant rate and direction
+
+	- Render green ball 
+				- at the posn-x of mouse and constant posn-y
+
+	- Detect collisions between white and red balls 
+				- for ball collisions, detect if the distance between the centers is less than the sum of the radii
+				remove the red ball when a collision occurs
+	
+	- Show the number of red balls that have been removed 
+		  by a number in the top right of the box
+
+	- End the game when a red ball reaches the bottom of the box
+				- show the game over page 
+
+	- cause more balls to generate at a time as the game progresses
+
+	
+
+
+
+
+5. Wishlist 
+
+;;mouse-handler: worldstate num num mouse-event -> worldstate
+;;updates the gBall position based on mouse movement, creates wBall upon click
+;;structural decomposition
+
+;;next-step: worldstate-> worldstate
+;;advances the worldstate over time, removes collided red balls and creates new ones
+;;function composition
+
+;;collision-filter: [rBall [listof wBall] -> boolean] worldstate -> worldstate
+;;removes rBalls from the worldstate if they have collided
+;;structural decomposition
+
+;;ball-collided?: rBall [listof wBall] -> boolean
+;;returns true if a given rBall has collided with any given wBall in a list
+;else returns false
+;;structural decomposition
+
+;;ceiling-filter: [wBall -> boolean] [listof wBall] -> [listof wBall]
+;;ball-ceiling?: wBall -> boolean
+;;returns true if a wBall has y-coordinates equal to the ceiling
+
+;;fall-rise: worldstate -> worldstate
+;; changes the y position over time depending on the type of Ball for wBall, rBall
+;; structural decomposition
+
+;;up-score: worldstate -> worldstate
+;;raises the score in worldstate by the number of rBall removed
+;;structural decomposition
+
+;;generate-red: worldstate -> worldstate
+;;generates red balls at a random chance that’s based on the score
+;;structural decomposition
+
+;;game-end?: [listof rBall] -> boolean
+;;returns true if the y coordinate of one rBall is equal to 0
+;;structural decomposition
+
+;; render-scene: worldstate -> image
+;; renders all aspects of the simulation as one image
+;;function composition
+
+;;render-red-white: worldstate color natural -> image
+;;renders a circle for each Ball, at its position and with given color and radius
+;;structural decomposition
+
+;;render-green: worldstate -> image
+;;renders a green circle with given x-position at bottom of screen
+;;structural decomposition
+
+;;render-score: worldstate -> image
+;;renders a number based on the score in the worldstate
+;;structural decomposition
+
+;;shooter-play
+Big-bang
+[on-scene render-scene]
+[on-mouse mouse-handler]
+[on-tick next-step]
+[stop-when game-end? shooter-end]
+
+;;render-end: worldstate -> image
+;;renders the endscreen after game over
+;;structural decomposition
+
+;;handle-key: worldstate key-event -> worldstate
+;;if p is pressed, restarts shooter-play, if q is pressed renders quit-scene and changes 
+;score to 0
+;;structural decomposition
+
+;;render-quit: worldstate -> image
+;;renders the quit scene
+;;structural decomposition
+
+;;quit-or-start?: worldstate -> boolean
+;;returns true if the score is 0
+;;structural decomposition
+
+;;shooter-end
+Big-bang
+[on-scene render-end]
+[on-key handle-key]
+[stop-when quit-or-start?]
+
+
+6. Open Questions & Anticipated Difficulties
+
+Making the game harder as time progresses will be a hard task, the most feasible way measure time progression would be by the score.  As for how to specifically implement the increasing difficulty, the chance of the rBall spawn will probably take a lot of trial and error.
+
+
+
+
+7. Implementation Plan:
+
+
+First we will define all relevant structs and parameters needed for our simulation.  Then we plan to first start with the functions that return booleans, because they are the easiest to test and many are also are the building blocks for our filter functions.  Once these predicates are complete we can start building up to the next level of functions that will come together to create the overall function that is run by big-bang.  For example, collision-filter is a mid level function built using ball-collided?, but is used as only part of next-step.  The render functions will likely require a lot of trial and error to accomplish the desired look, therefore should be worked on throughout the project using example states.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
